@@ -1,4 +1,5 @@
-import numpy as np 
+import numpy as np
+from math import exp, sqrt, pi
 
 #Danceability
 #Energy
@@ -60,4 +61,57 @@ new_song2 = [0.9, 0.1, 0.1, 0.1] # issue with singular matrices
 
 # print(predict_score(songs_matrix, user_likes, new_song, 0))
 print(predict_score(songs_matrix2, user_likes2, new_song2, 0))
+
+songs_matrix3 = np.array([[1,0.1, 0.1, 0.1],
+                          [0.1, 0.98, 0.9, 0.98],
+                          [0.1, 0.97, 0.92, 0.95],
+                          [0.1, 0.99, 0.95, 0.96]])
+
+user_likes2 = [10, 1, 1, 1]
+
+new_song2 = [0.8, 0.2, 0.2, 0.2] # issue with singular matrices
+
+scores = [list(a[0]) for a in list(zip([a for a in songs_matrix3]))]
+print(scores)
+
+
+def count_up(scores,likes):
+    table = []
+    for i in enumerate(scores):
+        table.append([])
+        for j in enumerate(i[1]):
+            for k in range(user_likes2[j[0]]):
+                table[i[0]].append(i[1][j[0]])
+    return table
+
+
+scores_table = count_up(scores,user_likes2)
+print(scores_table)
+
+
+def get_means(table):
+    return [sum(a)/len(a) for a in table]
+
+
+means = get_means(scores_table)
+
+print(means)
+
+
+def get_stdevs(table, means):
+    return [sum([(score-mean[1])**2 for score in table[mean[0]]])/len(table[mean[0]]) for mean in enumerate(means)]
+
+
+stdevs = get_stdevs(scores_table, means)
+print(stdevs)
+
+
+def normal_distribution(mean , sd, x):
+    prob_density = (np.pi*sd) * np.exp(-0.5*((x-mean)/sd)**2)
+    return prob_density
+
+
+for i in enumerate(new_song2):
+    print(i)
+    print(normal_distribution(means[i[0]], stdevs[i[0]], i[1])/(stdevs[i[0]]*sqrt(2*pi))*8)
 
